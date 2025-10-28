@@ -1,98 +1,123 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# User Registration Backend API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Đây là backend API cho hệ thống đăng ký người dùng, được xây dựng bằng [NestJS](https://nestjs.com/), một framework Node.js tiên tiến để xây dựng các ứng dụng server-side hiệu quả và có khả năng mở rộng.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Tính năng
 
-## Description
+- Endpoint đăng ký người dùng (`/user/register`)
+- Validation dữ liệu đầu vào (email, password)
+- Mã hóa mật khẩu bằng bcrypt
+- Xử lý lỗi (ví dụ: email đã tồn tại)
+- Tích hợp Docker để dễ dàng cài đặt và chạy ở môi trường local.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## Cài đặt và Chạy ứng dụng
 
-```bash
-$ npm install
-```
+Có hai cách để chạy dự án này ở môi trường local:
 
-## Compile and run the project
+### 1. Sử dụng Docker (Khuyến nghị)
 
-```bash
-# development
-$ npm run start
+Đây là cách đơn giản và nhanh nhất để khởi chạy toàn bộ môi trường
 
-# watch mode
-$ npm run start:dev
+**Yêu cầu:**
 
-# production mode
-$ npm run start:prod
-```
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/) (thường được cài đặt sẵn cùng Docker Desktop)
 
-## Run tests
+**Các bước thực hiện:**
 
-```bash
-# unit tests
-$ npm run test
+1.  **Tạo file biến môi trường:**
+    Sao chép file `.env.example` thành một file mới tên là `.env`.
 
-# e2e tests
-$ npm run test:e2e
+    ```bash
+    cp .env.example .env
+    ```
 
-# test coverage
-$ npm run test:cov
-```
+    _Bạn có thể tùy chỉnh các biến trong file `.env` nếu muốn, nhưng các giá trị mặc định đã được cấu hình để hoạt động với Docker Compose._
 
-## Deployment
+2.  **Khởi chạy các services:**
+    Chạy lệnh sau từ thư mục `back-end`. Docker sẽ tự động build image cho API.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+    ```bash
+    docker-compose up --build -d
+    ```
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+    - `--build`: Bắt buộc build lại image nếu có thay đổi trong `Dockerfile`.
+    - `-d`: Chạy ở chế độ "detached" (chạy ngầm).
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+3.  **Kiểm tra:**
+    API sẽ chạy tại `http://localhost:3000`.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+4.  **Để dừng các services:**
+    ```bash
+    docker-compose down
+    ```
 
-## Resources
+### 2. Cài đặt thủ công
 
-Check out a few resources that may come in handy when working with NestJS:
+Sử dụng cách này nếu bạn không muốn dùng Docker và đã có sẵn Node.js, npm, và một instance MongoDB đang chạy.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+**Yêu cầu:**
 
-## Support
+- Node.js (v18 trở lên)
+- npm
+- MongoDB (đang chạy ở local hoặc một chuỗi kết nối từ MongoDB Atlas)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+**Các bước thực hiện:**
 
-## Stay in touch
+1.  **Cài đặt dependencies:**
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+    ```bash
+    npm install
+    ```
 
-## License
+2.  **Tạo và cấu hình file `.env`:**
+    Tạo một file `.env` và thêm vào biến môi trường `MONGODB_URI`.
+    ```bash
+    cp .env.example .env
+    ```
+    Chạy chế độ development:
+    ```bash
+    npm run start:dev
+    ```
+    API sẽ chạy tại `http://localhost:3000` và sẽ tự động khởi động lại khi có thay đổi trong source code.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+---
+
+## API Endpoints
+
+- **POST** `/user/register`
+  - **Body:**
+    ```json
+    {
+      "email": "test@example.com",
+      "password": "password123"
+    }
+    ```
+  - **Success Response (201):**
+    ```json
+    {
+      "email": "test@example.com",
+      "createdAt": "...",
+      "updatedAt": "...",
+      "_id": "...",
+      "__v": 0
+    }
+    ```
+  - **Error Response (400 - Bad Request):**
+    ```json
+    {
+      "message": ["Password must be at least 8 characters."],
+      "error": "Bad Request",
+      "statusCode": 400
+    }
+    ```
+  - **Error Response (409 - Conflict):**
+    ```json
+    {
+      "message": "Email already in use.",
+      "error": "Conflict",
+      "statusCode": 409
+    }
+    ```
