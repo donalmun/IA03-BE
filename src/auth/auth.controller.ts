@@ -42,7 +42,7 @@ export class AuthController {
     response.cookie('refresh_token', refresh_token, {
       httpOnly: true,
       secure: isProduction, // Chỉ true khi ở môi trường production
-      sameSite: 'strict',
+      sameSite: isProduction ? 'none' : 'lax',
       path: '/',
       expires: expires, // Sử dụng ngày hết hạn từ service
     });
@@ -77,7 +77,7 @@ export class AuthController {
     response.clearCookie('refresh_token', {
       httpOnly: true,
       secure: isProduction,
-      sameSite: 'strict',
+      sameSite: isProduction ? 'none' : 'lax',
       path: '/',
     });
 
