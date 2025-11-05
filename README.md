@@ -1,14 +1,18 @@
-# User Registration Backend API
+# User Registration & Authentication API
 
-Đây là backend API cho hệ thống đăng ký người dùng, được xây dựng bằng [NestJS](https://nestjs.com/), một framework Node.js tiên tiến để xây dựng các ứng dụng server-side hiệu quả và có khả năng mở rộng.
+Đây là backend API cho một hệ thống xác thực người dùng hoàn chỉnh, được xây dựng bằng [NestJS](https://nestjs.com/), một framework Node.js tiên tiến để xây dựng các ứng dụng server-side hiệu quả và có khả năng mở rộng.
 
-## Tính năng
+## Tính năng Chính
 
-- Endpoint đăng ký người dùng (`/user/register`)
-- Validation dữ liệu đầu vào (email, password)
-- Mã hóa mật khẩu bằng bcrypt
-- Xử lý lỗi (ví dụ: email đã tồn tại)
-- Tích hợp Docker để dễ dàng cài đặt và chạy ở môi trường local.
+- **Đăng ký & Đăng nhập:** Endpoint để tạo tài khoản và đăng nhập.
+- **Xác thực bằng JWT:** Sử dụng JSON Web Tokens với cặp Access Token (ngắn hạn) và Refresh Token (dài hạn).
+- **Lưu trữ Refresh Token an toàn:** Refresh token được lưu trong database và được thu hồi khi logout.
+- **Bảo mật với `httpOnly` Cookies:** Refresh token được gửi về client qua `httpOnly` cookie để chống lại tấn công XSS.
+- **Bảo vệ Endpoint:** Sử dụng NestJS Guards để bảo vệ các route yêu cầu xác thực.
+- **Phân quyền dựa trên Vai trò (RBAC):** Cung cấp các endpoint chỉ dành cho `admin`.
+- **Mã hóa Mật khẩu:** Mật khẩu được hash an toàn bằng `bcrypt`.
+- **Validation:** Dữ liệu đầu vào được kiểm tra chặt chẽ bằng `class-validator`.
+- **Tích hợp Docker:** Cấu hình sẵn `docker-compose` để dễ dàng khởi chạy toàn bộ môi trường (API + MongoDB).
 
 ---
 
@@ -87,37 +91,32 @@ Sử dụng cách này nếu bạn không muốn dùng Docker và đã có sẵn
 
 ## API Endpoints
 
+### `/auth`
+
+- **POST** `/auth/login`
+  - **Body:** `{ "email": "...", "password": "..." }`
+  - **Success Response (200):**
+    - Trả về JSON: `{ "access_token": "..." }`
+    - Set `refresh_token` trong một `httpOnly` cookie.
+
+- **POST** `/auth/refresh`
+  - **Body:** (Rỗng) - Gửi `refresh_token` qua cookie.
+  - **Success Response (200):** Trả về `{ "access_token": "..." }` mới.
+
+- **POST** `/auth/logout`
+  - **Body:** (Rỗng) - Gửi `refresh_token` qua cookie.
+  - **Success Response (200):** Trả về `{ "message": "Logged out successfully" }` và xóa cookie.
+
+### `/user`
+
 - **POST** `/user/register`
-  - **Body:**
-    ```json
-    {
-      "email": "test@example.com",
-      "password": "password123"
-    }
-    ```
-  - **Success Response (201):**
-    ```json
-    {
-      "email": "test@example.com",
-      "createdAt": "...",
-      "updatedAt": "...",
-      "_id": "...",
-      "__v": 0
-    }
-    ```
-  - **Error Response (400 - Bad Request):**
-    ```json
-    {
-      "message": ["Password must be at least 8 characters."],
-      "error": "Bad Request",
-      "statusCode": 400
-    }
-    ```
-  - **Error Response (409 - Conflict):**
-    ```json
-    {
-      "message": "Email already in use.",
-      "error": "Conflict",
-      "statusCode": 409
-    }
-    ```
+  - **Body:** `{ "email": "...", "password": "..." }`
+  - **Success Response (201):** Trả về thông tin user đã được tạo (không bao gồm password).
+
+- **GET** `/user/me`
+  - **Yêu cầu:** Cần Access Token (đã đăng nhập).
+  - **Success Response (200):** Trả về thông tin của user hiện tại (`{ userId, email, role }`).
+
+- **GET** `/user/all`
+  - **Yêu cầu:** Cần Access Token VÀ user phải có vai trò `admin`.
+  - **Success Response (200):** Trả về danh sách tất cả người dùng trong hệ thống.
