@@ -26,4 +26,8 @@ export class UserService {
 
     return createdUser.save();
   }
+
+  async findAll(): Promise<User[]> {
+    return this.userModel.find().select('-password').exec();
+  }
 }
